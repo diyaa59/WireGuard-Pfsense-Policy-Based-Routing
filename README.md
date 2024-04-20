@@ -2,7 +2,8 @@
 
 Documentation of how to use Pfsense to utilize Policy Based Routing (PBR) to a remote cloud virtual private server. This will allow you to setup custom routes for specific hosts in your network to route out of a VPS public IP.
 
-> Warning: I am using nftables in this setup. Installing nftables over iptables "might" override your iptables ruleset.
+> [!WARNING]
+> I am using nftables in this setup. Installing nftables over iptables "might" override your iptables ruleset.
 
 # VPS setup:
 
@@ -33,13 +34,15 @@ sudo sysctl -p
 
 Place the config below in the following file `/etc/nftables.conf`.
 
-Change the following parameters to meet your needs:
-
-- `DEV_WORLD`: The WAN interface of the VPS. You will need to find what interface on your VPS has a public IP on it.
-- `Local_Networks`: The ranges of your local network behind your Pfsense router. You can seperate multiple ranges with a comma.
-- `SSH_In_Port`: SSH port to allow through nftables ruleset. Not adding this means you won't be able to SSH into your VPS instance.
-- `WireGuard_In_Port`: The WireGuard port to listen on from WAN. I recommend changing this to anything other than the default port (default port is 51820).
-- `IPv4_DEV_WireGuard_MSS`: This is the Maximum Segment Size (MSS) value that will be set for outbound TCP connections.
+> [!IMPORTANT]
+> 
+> Change the following parameters to meet your needs:.
+> 
+> - `DEV_WORLD`: The WAN interface of the VPS. You will need to find what interface on your VPS has a public IP on it.
+> - `Local_Networks`: The ranges of your local network behind your Pfsense router. You can seperate multiple ranges with a comma.
+> - `SSH_In_Port`: SSH port to allow through nftables ruleset. Not adding this means you won't be able to SSH into your VPS instance.
+> - `WireGuard_In_Port`: The WireGuard port to listen on from WAN. I recommend changing this to anything other than the default port (default port is 51820).
+> - `IPv4_DEV_WireGuard_MSS`: This is the Maximum Segment Size (MSS) value that will be set for outbound TCP connections.
 
 Nftables configuration:
 
@@ -115,7 +118,7 @@ table inet global {
 
 Apply the nftables ruleset:
 
-> Note:
+> [!NOTE]
 > You might face an error where nftables is unable to restart. This can happen if the kernel module for NAT masquerade is not loaded.
 > You just need to reboot your instance `sudo reboot now` and that should fix the issue.
 
@@ -131,7 +134,7 @@ You can use this baby script that I made to generate all the WireGuard keys for 
 
 WireGuard keys generation baby script:
 
-> Note:
+> [!NOTE]
 > You will need the values from the output of these commands later. Paste them in an empty file.
 
 ```bash
@@ -149,13 +152,14 @@ echo "Preshared Key: ${PRESHARED_KEY}"
 
 ### VPS WireGuard configuration:
 
-Things to change in the WireGuard configuration of the VPS:
-
-- Be sure to change the `ListenPort` value to match the `WireGuard_In_Port` value in the nftables rulebase configuration.
-- Replace the `localPrivateKeyAbcAbcAbc=` value with the `VPS private key` value from the script in the previous section.
-- Replace the `remotePublicKeyAbcAbcAbc=` value with the `Pfsense public key` value from the script in the previous section.
-- Replace the `presharedkeyabcabcabc=` value with the `Preshared key` value from the script in the previous section.
-- The `AllowedIPs` field needs to include all the IPs that will be forwarded up the tunnel as well as the Pfsense WireGuard tunnel interface IP.
+> [!IMPORTANT]
+> Things to change in the WireGuard configuration of the VPS:
+> 
+> - Be sure to change the `ListenPort` value to match the `WireGuard_In_Port` value in the nftables rulebase configuration.
+> - Replace the `localPrivateKeyAbcAbcAbc=` value with the `VPS private key` value from the script in the previous section.
+> - Replace the `remotePublicKeyAbcAbcAbc=` value with the `Pfsense public key` value from the script in the previous section.
+> - Replace the `presharedkeyabcabcabc=` value with the `Preshared key` value from the script in the previous section.
+> - The `AllowedIPs` field needs to include all the IPs that will be forwarded up the tunnel as well as the Pfsense WireGuard tunnel interface IP.
 
 VPS WireGuard configuration:
 
@@ -190,4 +194,5 @@ sudo systemctl enable --now wg-quick@wg0
 
 ### Pfsense configuration:
 
-Still working on this section....
+> [!NOTE]
+> I am still working on this section 🙂.
